@@ -10,5 +10,5 @@ class Destination(BaseModel):
     trivia: List[str]
 
 class GuessRequest(BaseModel):
-    alias: str  
-    guess: str   
+    id: str  
+    user_guess: str
