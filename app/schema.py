@@ -8,8 +8,6 @@ class Destination(BaseModel):
     clues : List[str]
     funFacts : List[str]
 
-    
-
 class GuessRequest(BaseModel):
     alias: str  
     guess: str   
