@@ -1,20 +1,20 @@
-# Use official Python image
+# Use an official Python runtime as a base image
 FROM python:3.11
 
-# Set working directory inside the container
-WORKDIR /app
+# Set the working directory inside the container
+WORKDIR /backend
 
-# Copy requirements.txt first to leverage Docker caching
-COPY requirements.txt /app/
+# Copy the application files
+COPY . /backend
 
 # Install dependencies
-RUN pip install --no-cache-dir -r /app/requirements.txt
+RUN pip install --no-cache-dir -r /backend/app/requirements.txt
 
-# Copy project files into the container
-COPY . /app
+# Ensure FastAPI finds the `app` module
+ENV PYTHONPATH=/backend/app
 
-# Expose FastAPI's default port
+# Expose the FastAPI port
 EXPOSE 8000
 
-# Run FastAPI app using Uvicorn
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Start the FastAPI application
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
