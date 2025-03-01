@@ -17,18 +17,20 @@ async def root():
 @router.get("/random")
 async def get_random_destination():
     try :
-        destinations = await destinations_collection.find().to_list(188)
+        random_destination = await destinations_collection.aggregate([{"$sample": {"size": 1}}]).to_list(1)
 
-        if not destinations :
+
+        if not random_destination :
             raise HTTPException(status_code=404, detail="No destination found")
         
-        random_destination = random.choice(destinations)
+        random_destination = random_destination[0]
 
         return {
-            "alias": random_destination["alias"],
-            "name": random_destination["name"],
-            "clues": random.sample(random_destination["clues"], min(2, len(random_destination["clues"]))),
-            "funFacts": random.sample(random_destination["funFacts"], min(1, len(random_destination["funFacts"])))
+            "city": random_destination['city'],
+            "country": random_destination['country'],
+            "clues": random_destination["clues"],
+            "fun_fact": random_destination['fun_fact'],
+            "trivia": random_destination['trivia']
         }
     
     except Exception as e :
