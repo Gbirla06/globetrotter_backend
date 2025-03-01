@@ -39,26 +39,25 @@ async def get_random_destination():
 async def add_destinations(in_data : List[Destination]) :
     try :
         # Commented this portion, not required any more now onwords we add data using input
-        # with open("globetrotter_dataset_unique_clues.json", "r", encoding="utf-8") as file :
+        # with open("cities_data.json", "r", encoding="utf-8") as file :
         #     data = json.load(file)
 
         if USER_ALLOW_TO_ADD_DATA :
-            count = await destinations_collection.count_documents({})
 
             for destination in in_data :
-                existing_doc = await destinations_collection.find_one({'name' : destination['name']})
+                existing_doc = await destinations_collection.find_one({'city' : destination['city']})
                 if existing_doc is None :
-                    count+=1
                     await destinations_collection.insert_one({
-                        "alias": f"dst{count}",
-                        "name": destination['name'],
+                        "city": destination['city'],
+                        "country": destination['country'],
                         "clues": destination['clues'],
-                        "funFacts": destination['funFacts']
+                        "fun_fact": destination['fun_fact'],
+                        "trivia": destination['trivia']
                     })
 
             return "Data inserted Successfully!!"
         else :
-            return "You ate not allowed to insert data. Thank You"
+            return "You are not allowed to insert data. Thank You"
 
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail="File Not found")

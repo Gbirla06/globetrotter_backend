@@ -3,10 +3,11 @@ from pydantic import BaseModel
 
 
 class Destination(BaseModel):
-    alias : str
-    name : str
-    clues : List[str]
-    funFacts : List[str]
+    city: str
+    country: str
+    clues: List[str]
+    fun_fact: List[str]
+    trivia: List[str]
 
 class GuessRequest(BaseModel):
     alias: str  
