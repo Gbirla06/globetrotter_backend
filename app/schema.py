@@ -11,4 +11,5 @@ class Destination(BaseModel):
 
 class GuessRequest(BaseModel):
     id: str  
+    username: str
     user_guess: str

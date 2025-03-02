@@ -3,9 +3,10 @@ import json
 import os
 from typing import List
 from fastapi import HTTPException, APIRouter
-from app.database import destinations_collection
+from app.database import destinations_collection, users_collection
 from app.schema import Destination, GuessRequest
 from bson.objectid import ObjectId
+from pymongo import ReturnDocument
 
 USER_ALLOW_TO_ADD_DATA = os.getenv("USER_ALLOW_TO_ADD_DATA", False)
 
@@ -24,10 +25,10 @@ async def get_random_destination():
         if not random_destination :
             raise HTTPException(status_code=404, detail="No destination found")
         
-        random.shuffle(random_destination)
         clues = random_destination[0]['clues']
-        options = [destination['city'] for destination in random_destination]
         id = str(random_destination[0]['_id'])
+        random.shuffle(random_destination)
+        options = [destination['city'] for destination in random_destination]
 
         return {
             "id" : id,
@@ -79,12 +80,38 @@ async def submit_guess(guess_data: GuessRequest):
     if not destination :
         raise HTTPException(status_code=404, detail="Destination Not Found")
     
+    guess_data.username = guess_data.username.lower()
     result = {}
     result['fun_fact'] = destination['fun_fact']
     result['trivia'] = destination['trivia']
+    result['username'] = guess_data.username
     if destination['city'] != guess_data.user_guess :
+        user = await users_collection.find_one_and_update(
+            {"username": guess_data.username},  
+            {"$inc": {"score": -1, "incorrect_score": 1}},
+            return_document=ReturnDocument.AFTER
+        )
+
+        if not user :
+            raise HTTPException(status_code=404, detail="Invalid User ID")
+        
+        result['score'] = user['score']
+        result['correct_score'] = user['correct_score']
+        result['incorrect_score'] = user['incorrect_score']
         result['is_guess_right'] = False
         return result
     
+    user = await users_collection.find_one_and_update(
+        {"username": guess_data.username},  
+        {"$inc": {"score": 1, "correct_score": 1}},
+        return_document=ReturnDocument.AFTER
+    )
+
+    if not user :
+        raise HTTPException(status_code=404, detail="Invalid User ID")
+    
+    result['score'] = user['score']
+    result['correct_score'] = user['correct_score']
+    result['incorrect_score'] = user['incorrect_score']
     result['is_guess_right'] = True
     return result

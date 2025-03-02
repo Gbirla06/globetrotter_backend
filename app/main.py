@@ -3,8 +3,17 @@ from app.routes.destinations import router as destinations_router
 from app.routes.users import router as users_router
 from app.routes.play import router as play_router
 from app.database import database
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Change this to your frontend URL for security
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/health")
 async def health_check():
