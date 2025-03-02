@@ -10,7 +10,7 @@ app = FastAPI()
 # Add CORS middleware to allow cross-origin requests
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Change this to your frontend URL for security
+    allow_origins=["https://globetrotter-frontend-vert.vercel.app/"],  # Change this to your frontend URL for security
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
